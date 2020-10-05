@@ -9,6 +9,7 @@ import (
 	"github.com/ipfs/go-ipfs/repo"
 	"github.com/ipfs/go-ipfs/repo/fsrepo"
 
+	badgeropts "github.com/dgraph-io/badger/v2/options"
 	humanize "github.com/dustin/go-humanize"
 	badger2ds "github.com/ipfs/go-ds-badger2"
 )
@@ -43,7 +44,11 @@ type datastoreConfig struct {
 	syncWrites bool
 	truncate   bool
 
-	vlogFileSize int64
+	compression          badgeropts.CompressionType
+	zstdCompressionLevel int
+
+	blockCacheSize int64
+	vlogFileSize   int64
 }
 
 // Badger2dsDatastoreConfig returns a configuration stub for a badger2 datastore
@@ -77,6 +82,43 @@ func (*badger2dsPlugin) DatastoreConfigParser() fsrepo.ConfigFromMap {
 				c.truncate = truncate
 			} else {
 				return nil, fmt.Errorf("'truncate' field was not a boolean")
+			}
+		}
+
+		switch cm := params["compression"].(string); cm {
+		case "none":
+			c.compression = badgeropts.None
+		case "snappy":
+			c.compression = badgeropts.Snappy
+		case "zstd1":
+			c.compression = badgeropts.ZSTD
+			c.zstdCompressionLevel = 1
+		case "zstd2":
+			c.compression = badgeropts.ZSTD
+			c.zstdCompressionLevel = 2
+		case "zstd3":
+			c.compression = badgeropts.ZSTD
+			c.zstdCompressionLevel = 3
+		case "":
+			c.compression = badger2ds.DefaultOptions.Compression
+			c.zstdCompressionLevel = badger2ds.DefaultOptions.ZSTDCompressionLevel
+		default:
+			return nil, fmt.Errorf("unrecognized value for compression: %s", cm)
+		}
+
+		bcs, ok := params["blockCacheSize"]
+		if !ok {
+			// default to 0 (disabled)
+			c.blockCacheSize = badger2ds.DefaultOptions.BlockCacheSize
+		} else {
+			if blockCacheSize, ok := bcs.(string); ok {
+				s, err := humanize.ParseBytes(blockCacheSize)
+				if err != nil {
+					return nil, err
+				}
+				c.blockCacheSize = int64(s)
+			} else {
+				return nil, fmt.Errorf("'blockCacheSize' field was not a string")
 			}
 		}
 
@@ -121,6 +163,9 @@ func (c *datastoreConfig) Create(path string) (repo.Datastore, error) {
 	defopts := badger2ds.DefaultOptions
 	defopts.SyncWrites = c.syncWrites
 	defopts.Truncate = c.truncate
+	defopts.Compression = c.compression
+	defopts.ZSTDCompressionLevel = c.zstdCompressionLevel
+	defopts.BlockCacheSize = c.blockCacheSize
 	defopts.ValueLogFileSize = c.vlogFileSize
 
 	return badger2ds.NewDatastore(p, &defopts)
