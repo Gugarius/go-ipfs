@@ -85,25 +85,37 @@ func (*badger2dsPlugin) DatastoreConfigParser() fsrepo.ConfigFromMap {
 			}
 		}
 
-		switch cm := params["compression"].(string); cm {
-		case "none":
-			c.compression = badgeropts.None
-		case "snappy":
-			c.compression = badgeropts.Snappy
-		case "zstd1":
-			c.compression = badgeropts.ZSTD
-			c.zstdCompressionLevel = 1
-		case "zstd2":
-			c.compression = badgeropts.ZSTD
-			c.zstdCompressionLevel = 2
-		case "zstd3":
-			c.compression = badgeropts.ZSTD
-			c.zstdCompressionLevel = 3
-		case "":
+		compression, ok := params["compression"]
+		if !ok {
+			// If not specified, use badger2 defaults (no compression)
 			c.compression = badger2ds.DefaultOptions.Compression
 			c.zstdCompressionLevel = badger2ds.DefaultOptions.ZSTDCompressionLevel
-		default:
-			return nil, fmt.Errorf("unrecognized value for compression: %s", cm)
+		} else {
+			if compression, ok := compression.(string); ok {
+				switch compression {
+				case "none":
+					c.compression = badgeropts.None
+				case "snappy":
+					c.compression = badgeropts.Snappy
+				case "zstd1":
+					c.compression = badgeropts.ZSTD
+					c.zstdCompressionLevel = 1
+				case "zstd2":
+					c.compression = badgeropts.ZSTD
+					c.zstdCompressionLevel = 2
+				case "zstd3":
+					c.compression = badgeropts.ZSTD
+					c.zstdCompressionLevel = 3
+				case "":
+					// If empty string, use badger2 defaults (no compression)
+					c.compression = badger2ds.DefaultOptions.Compression
+					c.zstdCompressionLevel = badger2ds.DefaultOptions.ZSTDCompressionLevel
+				default:
+					return nil, fmt.Errorf("unrecognized value for compression: %s", compression)
+				}
+			} else {
+				return nil, fmt.Errorf("'compression' field is not string")
+			}
 		}
 
 		bcs, ok := params["blockCacheSize"]
