@@ -87,7 +87,7 @@ func (*badger2dsPlugin) DatastoreConfigParser() fsrepo.ConfigFromMap {
 
 		compression, ok := params["compression"]
 		if !ok {
-			// If not specified, use badger2 defaults (no compression)
+			// If not specified, use go-ds-badger2 defaults
 			c.compression = badger2ds.DefaultOptions.Compression
 			c.zstdCompressionLevel = badger2ds.DefaultOptions.ZSTDCompressionLevel
 		} else {
@@ -107,7 +107,7 @@ func (*badger2dsPlugin) DatastoreConfigParser() fsrepo.ConfigFromMap {
 					c.compression = badgeropts.ZSTD
 					c.zstdCompressionLevel = 3
 				case "":
-					// If empty string, use badger2 defaults (no compression)
+					// If empty string, use go-ds-badger2 defaults
 					c.compression = badger2ds.DefaultOptions.Compression
 					c.zstdCompressionLevel = badger2ds.DefaultOptions.ZSTDCompressionLevel
 				default:
@@ -120,7 +120,7 @@ func (*badger2dsPlugin) DatastoreConfigParser() fsrepo.ConfigFromMap {
 
 		bcs, ok := params["blockCacheSize"]
 		if !ok {
-			// default to 0 (disabled)
+			// If not specified, use go-ds-badger2 defaults
 			c.blockCacheSize = badger2ds.DefaultOptions.BlockCacheSize
 		} else {
 			if blockCacheSize, ok := bcs.(string); ok {
