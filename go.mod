@@ -2,14 +2,13 @@ module github.com/ipfs/go-ipfs
 
 require (
 	bazil.org/fuse v0.0.0-20200117225306-7b5117fecadc
-	github.com/AndreasBriese/bbloom v0.0.0-20190825152654-46b345b51c96 // indirect
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/bren2010/proquint v0.0.0-20160323162903-38337c27106d
+	github.com/cheggaaa/pb v1.0.29
 	github.com/coreos/go-systemd/v22 v22.1.0
 	github.com/dgraph-io/badger/v2 v2.0.1-rc1.0.20201002071632-68fb85d55d4b
 	github.com/dustin/go-humanize v1.0.0
 	github.com/elgris/jsondiff v0.0.0-20160530203242-765b5c24c302
-	github.com/fatih/color v1.9.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/gabriel-vasile/mimetype v1.1.1
 	github.com/go-bindata/go-bindata/v3 v3.1.3
@@ -23,7 +22,7 @@ require (
 	github.com/ipfs/go-cidutil v0.0.2
 	github.com/ipfs/go-datastore v0.4.5
 	github.com/ipfs/go-detect-race v0.0.1
-	github.com/ipfs/go-ds-badger v0.2.4
+	github.com/ipfs/go-ds-badger v0.2.5
 	github.com/ipfs/go-ds-badger2 v0.1.1-0.20201005172105-8fe207b8dc7e
 	github.com/ipfs/go-ds-flatfs v0.4.5
 	github.com/ipfs/go-ds-leveldb v0.4.2
@@ -109,7 +108,6 @@ require (
 	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
 	golang.org/x/sys v0.0.0-20201005172224-997123666555
 	golang.org/x/tools v0.0.0-20200522201501-cb1345f3a375 // indirect
-	gopkg.in/cheggaaa/pb.v1 v1.0.28
 )
 
 go 1.13
