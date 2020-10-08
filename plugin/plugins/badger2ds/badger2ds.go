@@ -51,8 +51,8 @@ type datastoreConfig struct {
 	vlogFileSize   int64
 }
 
-// Badger2dsDatastoreConfig returns a configuration stub for a badger2 datastore
-// from the given parameters
+// DatastoreConfigParser returns a function that creates a new badger2
+// datastore config from a map of badger2 configuration parameters.
 func (*badger2dsPlugin) DatastoreConfigParser() fsrepo.ConfigFromMap {
 	return func(params map[string]interface{}) (fsrepo.DatastoreConfig, error) {
 		var c datastoreConfig
@@ -136,7 +136,7 @@ func (*badger2dsPlugin) DatastoreConfigParser() fsrepo.ConfigFromMap {
 
 		vls, ok := params["vlogFileSize"]
 		if !ok {
-			// default to 1GiB
+			// If not specified, use go-ds-badger2 defaults
 			c.vlogFileSize = badger2ds.DefaultOptions.ValueLogFileSize
 		} else {
 			if vlogSize, ok := vls.(string); ok {
